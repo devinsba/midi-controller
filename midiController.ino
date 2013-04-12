@@ -62,7 +62,11 @@ void loop() {
 		if (buttons[i].risingEdge()) {
 			usbMIDI.sendNoteOff(notes[i], 0, CHANNEL);
 		}
+	}
+	for (i = 0; i < 8; i++) {
 		usbMIDI.sendControlChange(potControls[i], pots[i], CHANNEL);
+	}
+	for (i = 0; i < 4; i++) {
 		usbMIDI.sendControlChange(slideControls[i], slides[i], CHANNEL);
 	}
 }
