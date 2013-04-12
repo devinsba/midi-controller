@@ -1,4 +1,5 @@
 #include <Bounce.h>
+#include "pot.h"
 
 void muxSelect(char addr);
 
