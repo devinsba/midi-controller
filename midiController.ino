@@ -31,11 +31,13 @@ const uint8_t slideControls[] = {88, 89, 90, 91};
 
 Bounce *buttons;
 
+char i = 0;
+
 void setup() {
 #ifdef DEBUG
 	Serial.begin(9600);
 #endif
-	int i = 0;
+	char j = 0;
 	pinMode(MUX_BIT0, OUTPUT);
 	pinMode(MUX_BIT1, OUTPUT);
 	pinMode(MUX_BIT2, OUTPUT);
@@ -45,15 +47,13 @@ void setup() {
 
 	// Setup the buttons
 	buttons = (Bounce *) calloc(16, sizeof(Bounce));
-	for (i = 0; i < 8; i++) {
-		buttons[i] = Bounce(MUX1_PIN, 5);
-		buttons[i + 8] = Bounce(MUX2_PIN, 5);
+	for (j = 0; j < 8; j++) {
+		buttons[j] = Bounce(MUX1_PIN, 5);
+		buttons[j + 8] = Bounce(MUX2_PIN, 5);
 	}
 }
 
 void loop() {
-	char i = 0;
-	
 	// Read the buttons
 	for (i = 0; i < 8; i++) {
 		muxSelect(i);
@@ -84,6 +84,7 @@ void loop() {
 	for (i = 0; i < 4; i++) {
 		usbMIDI.sendControlChange(slideControls[i], slides[i], CHANNEL);
 	}
+	usbMIDI.send_now();
 }
 
 void muxSelect(char addr) {
