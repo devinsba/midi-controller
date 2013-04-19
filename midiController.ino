@@ -1,6 +1,13 @@
 #include <Bounce.h>
 #include "pot.h"
 
+//#define DEBUG
+#ifdef DEBUG
+#define print Serial.println
+#else
+#define print
+#endif
+
 void muxSelect(char addr);
 
 const uint8_t CHANNEL = 1;
@@ -14,7 +21,7 @@ const uint8_t MUX2_PIN = 6;
 const uint8_t MUX3_PIN = A0;
 const uint8_t MUX4_PIN = A1;
 
-const uint8_t notes[] = {60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75};
+const uint8_t notes[] = {60, 61, 62, 63, 56, 57, 58, 59, 52, 53, 54, 55, 48, 49, 50, 51};
 
 uint8_t pots[8];
 const uint8_t potControls[] = {80, 81, 82, 83, 84, 85, 86, 87};
@@ -25,6 +32,9 @@ const uint8_t slideControls[] = {88, 89, 90, 91};
 Bounce *buttons;
 
 void setup() {
+#ifdef DEBUG
+	Serial.begin(9600);
+#endif
 	int i = 0;
 	pinMode(MUX_BIT0, OUTPUT);
 	pinMode(MUX_BIT1, OUTPUT);
@@ -58,9 +68,13 @@ void loop() {
 	// Handle the buttons
 	for (i = 0; i < 16; i++) {
 		if (buttons[i].fallingEdge()) {
+                        print("BUTTON DOWN");
+                        print(int(notes[i]));
 			usbMIDI.sendNoteOn(notes[i], 99, CHANNEL);
 		}
 		if (buttons[i].risingEdge()) {
+                        print("BUTTON UP");
+                        print(int(notes[i]));
 			usbMIDI.sendNoteOff(notes[i], 0, CHANNEL);
 		}
 	}
