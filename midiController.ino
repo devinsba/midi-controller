@@ -81,8 +81,8 @@ void loop() {
 #endif
 	}
 
-	// Handle the buttons
 #ifdef BUTTONS
+	// Handle the buttons
 	for (i = 0; i < 16; i++) {
 		if (buttons[i].fallingEdge()) {
 			print("BUTTON DOWN");

@@ -1,6 +1,9 @@
 #include "pot.h"
 
+#include <stdint.h>
+
 Pot::Pot(uint8_t pin) {
+	changed = false;
 	myPin = pin;
 }
 
