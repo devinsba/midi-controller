@@ -9,8 +9,8 @@
 #endif
 
 #define BUTTONS
-#define POTS 3
-//#define SLIDES
+#define POTS 4
+//#define SLIDES 4
 
 void muxSelect(char addr);
 
@@ -26,14 +26,12 @@ const uint8_t MUX3_PIN = A0;
 const uint8_t MUX4_PIN = A1;
 
 const uint8_t notes[] = {48, 49, 50, 51, 44, 45, 46, 47, 40, 41, 42, 43, 36, 37, 38, 39};
-
-uint8_t pots[8];
-const uint8_t potControls[] = {1, 16, 17, 18, 18, 18, 18, 18};
-
-uint8_t slides[4];
-const uint8_t slideControls[] = {8, 9, 10, 11};
+const uint8_t potControls[] = {14, 15, 16, 17, 18, 19, 20, 21};
+const uint8_t slideControls[] = {2, 3, 4, 5};
 
 Bounce *buttons;
+Pot *pots;
+Pot *slides;
 
 char i = 0;
 
@@ -57,6 +55,24 @@ void setup() {
 		buttons[j + 8] = Bounce(MUX2_PIN, 5);
 	}
 #endif
+
+#ifdef POTS
+	pinMode(MUX3_PIN, INPUT_PULLUP);
+
+	pots = (Pot *) calloc(POTS, sizeof(Pot));
+	for (j = 0; j < POTS; j++) {
+		pots[i] = Pot(MUX3_PIN);
+	}
+#endif
+
+#ifdef SLIDES
+	pinMode(MUX4_PIN, INPUT_PULLUP);
+
+	slides = (Pot *) calloc(SLIDES, sizeof(Pot));
+	for (j = 0; j < SLIDES; j++) {
+		slides[i] = Pot(MUX4_PIN);
+	}
+#endif
 }
 
 void loop() {
@@ -68,15 +84,13 @@ void loop() {
 		buttons[i + 8].update();
 #endif
 #ifdef POTS
-		uint8_t temp = map(analogRead(MUX3_PIN), 0, 1023, 0, 127);
-		if (temp != pots[i] && i == 0) {
-			print(int(temp));
+		if (i < POTS) {
+			pots[i].update();
 		}
-		pots[i] = temp;
 #endif
 #ifdef SLIDES
-		if (i < 4) {
-			slides[i] = analogRead(MUX4_PIN);
+		if (i < SLIDES) {
+			slides[i].update();
 		}
 #endif
 	}
@@ -98,13 +112,21 @@ void loop() {
 #endif
 #ifdef POTS
 	for (i = 0; i < POTS; i++) {
-		usbMIDI.sendControlChange(potControls[i], pots[i], CHANNEL);
+		if (pots[i].hasChanged()) {
+			usbMIDI.sendControlChange(
+					potControls[i],
+					pots[i].getValue(),
+					CHANNEL);
+		}
 	}
 #endif
 #ifdef SLIDES
-	for (i = 0; i < 4; i++) {
-		usbMIDI.sendControlChange(slideControls[i], slides[i], CHANNEL);
-	}
+	if (pots[i].hasChanged()) {
+			usbMIDI.sendControlChange(
+					slideControls[i],
+					slides[i].getValue(),
+					CHANNEL);
+		}
 #endif
 	usbMIDI.send_now();
 }
@@ -113,5 +135,5 @@ void muxSelect(char addr) {
 	digitalWrite(MUX_BIT0, addr & 1);
 	digitalWrite(MUX_BIT1, (addr >> 1) & 1);
 	digitalWrite(MUX_BIT2, (addr >> 2) & 1);
-	delayMicroseconds(5);
+	delayMicroseconds(15);
 }

@@ -8,9 +8,12 @@ Pot::Pot(uint8_t pin) {
 }
 
 bool Pot::update() {
-	uint8_t temp = analogRead(myPin) / 8;
-	if (temp != lastValue) {
-		lastValue = temp;
+	uint16_t temp = analogRead(myPin);
+	uint8_t small = 0;
+	if (temp < fullValue - 4 || temp > fullValue + 4) {
+		small = map(temp, 0, 1023, 0, 127);
+		fullValue = temp;
+		lastValue = small;
 		changed = true;
 	}
 	return changed;

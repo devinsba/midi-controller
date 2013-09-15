@@ -7,6 +7,7 @@
 class Pot {
 private:
 	uint8_t myPin;
+	uint16_t fullValue;
 	uint8_t lastValue;
 	bool changed;
 
@@ -18,8 +19,6 @@ public:
 	bool update();
 	bool hasChanged();
 	uint8_t getValue();
-
-	/* data */
 };
 
 #endif
